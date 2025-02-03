@@ -3,7 +3,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 
 import "./globals.css";
-// import { ThemeProvider } from "@/providers/theme-provider";
+import { ThemeProvider } from "@/providers/theme-provider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -17,16 +17,17 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider appearance={{ baseTheme: dark }}>
-      <html lang="en" 
-      suppressHydrationWarning>
-        {/* <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-        </ThemeProvider> */}
-          <body>{children}</body>
+      <html lang="en" suppressHydrationWarning>
+        <body>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </body>
       </html>
     </ClerkProvider>
   );
