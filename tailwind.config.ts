@@ -19,7 +19,7 @@ module.exports = withUt({
   		}
   	},
   	extend: {
-  		colors: {
+		colors: {
   			tremor: {
   				brand: {
   					faint: 'colors.blue[50]',
