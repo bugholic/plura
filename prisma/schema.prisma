@@ -33,7 +33,7 @@ model User {
   updatedAt    DateTime       @updatedAt
   role         Role           @default(SUBACCOUNT_USER)
   agencyId     String?
-  Agency       Agency         @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  Agency       Agency?         @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   Permisson    Permissions[]
   Tickets      Ticket[]
   Notification Notification[]
