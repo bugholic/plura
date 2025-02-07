@@ -13,7 +13,7 @@ export const getAuthUserDetails = async () => {
 
   const userData = await db.user.findUnique({
     where: { email: user.emailAddresses[0].emailAddress },
-    includes: {
+    include: {
       Agency: {
         include: {
           SidebarOption: true,
@@ -65,7 +65,7 @@ export const saveActivityLogsNotification = async ({
       if (!subaccountId) {
         throw new Error("You need to provide Agency Id or Sub Account Id");
       }
-      const response = await db.SubAccount.findUnique({
+      const response = await db.subAccount.findUnique({
         where: { id: subaccountId },
       });
       if (response) {
@@ -114,9 +114,9 @@ export const saveActivityLogsNotification = async ({
 };
 
 export const createTeamUser = async (agencyId: string, user: User) => {
-  if (user.role === "AGENCY_OWNER") return null;
+  if (User.role === "AGENCY_OWNER") return null;
   const response = await db.user.create({
-    data: { ...user },
+    data: { ...User },
   });
   return response;
 };
