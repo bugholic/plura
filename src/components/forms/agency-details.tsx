@@ -17,7 +17,7 @@ import {
 } from "../ui/alert-dialog";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { NumberInput } from "@tremor/react";
-import { deleteAgency, updateAgencyDetails } from "@/lib/queries";
+import { deleteAgency, initUser, updateAgencyDetails, upsertAgency } from "@/lib/queries";
 import {
   Card,
   CardContent,
@@ -41,13 +41,14 @@ import { Input } from "../ui/input";
 import { Switch } from "../ui/switch";
 import { Button } from "../ui/button";
 import Loading from "../global/loading";
+import { v4 } from "uuid";
 
 type Props = {
-  data?: Partial<Agency>
+  data?: Partial<Agency>;
 };
 
 const FormSchema = z.object({
-  name: z.string().min(2, { message: 'Agency name must be atleast 2 chars.' }),
+  name: z.string().min(2, { message: "Agency name must be atleast 2 chars." }),
   companyEmail: z.string().min(1),
   companyPhone: z.string().min(1),
   whiteLabel: z.boolean(),
@@ -57,7 +58,7 @@ const FormSchema = z.object({
   state: z.string().min(1),
   country: z.string().min(1),
   agencyLogo: z.string().min(1),
-})
+});
 
 const AgencyDetails = ({ data }: Props) => {
   const toast = Toast;
@@ -113,9 +114,9 @@ const AgencyDetails = ({ data }: Props) => {
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
-      let newUserData
+      let newUserData;
       let customerId;
-      if(!data?.id){
+      if (!data?.id) {
         const bodyData = {
           email: values.companyEmail,
           name: values.name,
@@ -136,13 +137,31 @@ const AgencyDetails = ({ data }: Props) => {
             postal_code: values.zipCode,
             state: values.zipCode,
           },
+        };
+
+        const newUserData = await initUser({ role: "AGENCY_OWNER" });
+        if (!data?.customerId) {
+          const response = await upsertAgency({
+            id: data?.id ? data.id : v4(),
+            customerId: data?.customerId,
+            address: values.address,
+            agencyLogo: values.agencyLogo,
+            city: values.city,
+            companyPhone: values.companyPhone,
+            country: values.country,
+            name: values.name,
+            state: values.state,
+            whiteLabel: values.whiteLabel,
+            zipCode: values.zipCode,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            companyEmail: values.companyEmail,
+            connectAccountId: "",
+            goal: 5,
+          });
         }
-       
-        const newUserData = await initUser({role:'AGENCY_OWNER'})
       }
-    } catch (error) {
-      
-    }
+    } catch (error) {}
   };
 
   return (
