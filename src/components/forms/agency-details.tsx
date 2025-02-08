@@ -2,7 +2,7 @@
 
 import { Agency } from "@prisma/client";
 import React, { useEffect } from "react";
-import { Toast } from "../ui/toast";
+
 import { useRouter } from "next/navigation";
 import {
   AlertDialog,
@@ -17,7 +17,13 @@ import {
 } from "../ui/alert-dialog";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { NumberInput } from "@tremor/react";
-import { deleteAgency, initUser, updateAgencyDetails, upsertAgency } from "@/lib/queries";
+import {
+  deleteAgency,
+  initUser,
+  saveActivityLogsNotification,
+  updateAgencyDetails,
+  upsertAgency,
+} from "@/lib/queries";
 import {
   Card,
   CardContent,
@@ -42,6 +48,7 @@ import { Switch } from "../ui/switch";
 import { Button } from "../ui/button";
 import Loading from "../global/loading";
 import { v4 } from "uuid";
+// import { useToast } from "../ui/use-toast";
 
 type Props = {
   data?: Partial<Agency>;
@@ -61,7 +68,7 @@ const FormSchema = z.object({
 });
 
 const AgencyDetails = ({ data }: Props) => {
-  const toast = Toast;
+  // const { toast } = useToast();
   const router = useRouter();
   const [deletingAgency, setDeletingAgency] = React.useState(false);
 
@@ -91,23 +98,25 @@ const AgencyDetails = ({ data }: Props) => {
     }
   }, [data, form]);
 
+  if (!data) return;
+
   const handleDeleteAgency = async () => {
     if (!data.id) return;
     setDeletingAgency(true);
     // WIP: discontinue agency subscription
     try {
       const response = await deleteAgency(data.id);
-      toast({
-        title: "Deleted Agency",
-        description: "Deleted your agency and all subaccounts",
-      });
+      // toast({
+      //   title: "Deleted Agency",
+      //   description: "Deleted your agency and all subaccounts",
+      // });
       router.refresh();
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Oops",
-        description: "Could not delete your agency",
-      });
+      // toast({
+      //   variant: "destructive",
+      //   title: "Oops",
+      //   description: "Could not delete your agency",
+      // });
       setDeletingAgency(false);
     }
   };
@@ -140,10 +149,9 @@ const AgencyDetails = ({ data }: Props) => {
         };
 
         const newUserData = await initUser({ role: "AGENCY_OWNER" });
-        if (!data?.customerId) {
+        if (!data?.id) {
           const response = await upsertAgency({
             id: data?.id ? data.id : v4(),
-            customerId: data?.customerId,
             address: values.address,
             agencyLogo: values.agencyLogo,
             city: values.city,
@@ -153,20 +161,34 @@ const AgencyDetails = ({ data }: Props) => {
             state: values.state,
             whiteLabel: values.whiteLabel,
             zipCode: values.zipCode,
-            createdAt: new Date(),
-            updatedAt: new Date(),
             companyEmail: values.companyEmail,
             connectAccountId: "",
             goal: 5,
+            createdAt: new Date(),
+            updatedAt: new Date(),
           });
+          // toast({
+          //   title: "Created Agency",
+          // });
+
+          if (data?.id) return router.refresh();
+          if (response) {
+            return router.refresh();  
+          }
         }
       }
-    } catch (error) {}
+    } catch (error) {
+      // toast({
+      //   variant: "destructive",
+      //   title: "Oops",
+      //   description: "Could not create your agency",
+      // });
+    }
   };
 
   return (
     <AlertDialog>
-      <Card>
+      <Card className="mt-10">
         <CardHeader>
           <CardTitle>Agency Information</CardTitle>
           <CardDescription>Lets create a agency for you.</CardDescription>
@@ -180,7 +202,7 @@ const AgencyDetails = ({ data }: Props) => {
               <FormField
                 disabled={isLoading}
                 control={form.control}
-                name="agencylogo"
+                name="agencyLogo"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Agency Logo</FormLabel>
@@ -211,7 +233,7 @@ const AgencyDetails = ({ data }: Props) => {
                 <FormField
                   disabled={isLoading}
                   control={form.control}
-                  name="email"
+                  name="companyEmail"
                   render={({ field }) => (
                     <FormItem className="flex-1">
                       <FormLabel>Agency Email</FormLabel>
@@ -226,7 +248,7 @@ const AgencyDetails = ({ data }: Props) => {
                 <FormField
                   disabled={isLoading}
                   control={form.control}
-                  name="phoneNumber"
+                  name="companyPhone"
                   render={({ field }) => (
                     <FormItem className="flex-1">
                       <FormLabel>Agency Phone Number</FormLabel>
@@ -266,7 +288,7 @@ const AgencyDetails = ({ data }: Props) => {
                 <FormField
                   disabled={isLoading}
                   control={form.control}
-                  name="Address"
+                  name="address"
                   render={({ field }) => (
                     <FormItem className="flex-1">
                       <FormLabel>Address</FormLabel>
@@ -294,7 +316,7 @@ const AgencyDetails = ({ data }: Props) => {
                 <FormField
                   disabled={isLoading}
                   control={form.control}
-                  name="State"
+                  name="state"
                   render={({ field }) => (
                     <FormItem className="flex-1">
                       <FormLabel>State</FormLabel>
@@ -307,7 +329,7 @@ const AgencyDetails = ({ data }: Props) => {
                 <FormField
                   disabled={isLoading}
                   control={form.control}
-                  name="Zipcode"
+                  name="zipCode"
                   render={({ field }) => (
                     <FormItem className="flex-1">
                       <FormLabel>Zipcode</FormLabel>
@@ -321,7 +343,7 @@ const AgencyDetails = ({ data }: Props) => {
               <FormField
                 disabled={isLoading}
                 control={form.control}
-                name="Country"
+                name="country"
                 render={({ field }) => (
                   <FormItem className="flex-1">
                     <FormLabel>Country</FormLabel>

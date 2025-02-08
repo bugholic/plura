@@ -3,8 +3,17 @@
 import { clerkClient, currentUser } from "@clerk/nextjs";
 import { db } from "./db";
 import { redirect } from "next/navigation";
-import { User } from "@clerk/nextjs/server";
-import { Agency, Plan } from "@prisma/client";
+import {
+  Agency,
+  Lane,
+  Plan,
+  Prisma,
+  Role,
+  SubAccount,
+  Tag,
+  Ticket,
+  User,
+} from "@prisma/client";
 
 // server action file
 
@@ -46,102 +55,102 @@ export const saveActivityLogsNotification = async ({
     const response = await db.user.findFirst({
       where: {
         Agency: {
-          SubAccount: { some: { id: subaccountId } },
+          SubAccount: {
+            some: { id: subaccountId },
+          },
         },
       },
     });
     if (response) {
       userData = response;
-    } else {
-      userData = await db.user.findUnique({
-        where: { email: authUser?.emailAddresses[0].emailAddress },
-      });
     }
-    if (!userData) {
-      console.log("Could not find a user");
-      return;
+  } else {
+    userData = await db.user.findUnique({
+      where: { email: authUser?.emailAddresses[0].emailAddress },
+    });
+  }
+
+  if (!userData) {
+    console.log("Could not find a user");
+    return;
+  }
+
+  let foundAgencyId = agencyId;
+  if (!foundAgencyId) {
+    if (!subaccountId) {
+      throw new Error(
+        "You need to provide atleast an agency Id or subaccount Id"
+      );
     }
-    let foundAgencyId = agencyId;
-    if (!foundAgencyId) {
-      if (!subaccountId) {
-        throw new Error("You need to provide Agency Id or Sub Account Id");
-      }
-      const response = await db.subAccount.findUnique({
-        where: { id: subaccountId },
-      });
-      if (response) {
-        foundAgencyId = response.agencyId;
-      }
-      if (subaccountId) {
-        await db.notification.create({
-          data: {
-            notification: `${userData.name} | ${description}`,
-            User: {
-              connect: {
-                id: userData.id,
-              },
-            },
-            Agency: {
-              connect: {
-                id: foundAgencyId,
-              },
-            },
-            SubAccount: {
-              connect: {
-                id: subaccountId,
-              },
-            },
+    const response = await db.subAccount.findUnique({
+      where: { id: subaccountId },
+    });
+    if (response) foundAgencyId = response.agencyId;
+  }
+  if (subaccountId) {
+    await db.notification.create({
+      data: {
+        notification: `${userData.name} | ${description}`,
+        User: {
+          connect: {
+            id: userData.id,
           },
-        });
-      } else {
-        await db.notification.create({
-          data: {
-            notification: `${userData.name} | ${description}`,
-            User: {
-              connect: {
-                id: userData.id,
-              },
-            },
-            Agency: {
-              connect: {
-                id: foundAgencyId,
-              },
-            },
+        },
+        Agency: {
+          connect: {
+            id: foundAgencyId,
           },
-        });
-      }
-    }
+        },
+        SubAccount: {
+          connect: { id: subaccountId },
+        },
+      },
+    });
+  } else {
+    await db.notification.create({
+      data: {
+        notification: `${userData.name} | ${description}`,
+        User: {
+          connect: {
+            id: userData.id,
+          },
+        },
+        Agency: {
+          connect: {
+            id: foundAgencyId,
+          },
+        },
+      },
+    });
   }
 };
 
 export const createTeamUser = async (agencyId: string, user: User) => {
-  if (User.role === "AGENCY_OWNER") return null;
-  const response = await db.user.create({
-    data: { ...User },
-  });
+  if (user.role === "AGENCY_OWNER") return null;
+  const response = await db.user.create({ data: { ...user } });
   return response;
 };
 export const verifyAndAcceptInvitation = async () => {
   const user = await currentUser();
   if (!user) return redirect("/sign-in");
-  const invitationExist = await db.invitation.findUnique({
+  const invitationExists = await db.invitation.findUnique({
     where: { email: user.emailAddresses[0].emailAddress, status: "PENDING" },
   });
 
-  if (invitationExist) {
-    const userDetails = await createTeamUser(invitationExist.agencyId, {
-      email: invitationExist.email,
-      agencyId: invitationExist.agencyId,
+  if (invitationExists) {
+    const userDetails = await createTeamUser(invitationExists.agencyId, {
+      email: invitationExists.email,
+      agencyId: invitationExists.agencyId,
       avatarUrl: user.imageUrl,
       id: user.id,
       name: `${user.firstName} ${user.lastName}`,
-      role: invitationExist.role,
+      role: invitationExists.role,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
     await saveActivityLogsNotification({
-      agencyId: invitationExist?.agencyId,
+      agencyId: invitationExists?.agencyId,
       description: `Joined`,
       subaccountId: undefined,
     });
@@ -224,43 +233,77 @@ export const upsertAgency = async (agency: Agency, price?: Plan) => {
       },
       update: agency,
       create: {
-        connect: { email: agency.companyEmail },
-      },
-      ...agency,
-      SidebarOption: {
-        create: [
-          {
-            name: "Dashboard",
-            icon: "category",
-            link: `/agency/${agency.id}`,
-          },
-          {
-            name: "Launchpad",
-            icon: "clipboardIcon",
-            link: `/agency/${agency.id}/launchpad`,
-          },
-          {
-            name: "Billing",
-            icon: "payment",
-            link: `/agency/${agency.id}/billing`,
-          },
-          {
-            name: "Settings",
-            icon: "settings",
-            link: `/agency/${agency.id}/settings`,
-          },
-          {
-            name: "Sub Accounts",
-            icon: "person",
-            link: `/agency/${agency.id}/all-subaccounts`,
-          },
-          {
-            name: "Team",
-            icon: "shield",
-            link: `/agency/${agency.id}/team`,
-          },
-        ],
+        users: {
+          connect: { email: agency.companyEmail },
+        },
+        ...agency,
+        // create: {
+        //   id: agency.id, // Include the ID if it's required
+        //   address: agency.address,
+        //   agencyLogo: agency.agencyLogo,
+        //   city: agency.city,
+        //   companyPhone: agency.companyPhone,
+        //   country: agency.country,
+        //   name: agency.name,
+        //   state: agency.state,
+        //   whiteLabel: agency.whiteLabel,
+        //   zipCode: agency.zipCode,
+        //   companyEmail: agency.companyEmail,
+        //   connectAccountId: agency.connectAccountId,
+        //   goal: agency.goal,
+        SidebarOption: {
+          create: [
+            {
+              name: "Dashboard",
+              icon: "category",
+              link: `/agency/${agency.id}`,
+            },
+            {
+              name: "Launchpad",
+              icon: "clipboardIcon",
+              link: `/agency/${agency.id}/launchpad`,
+            },
+            {
+              name: "Billing",
+              icon: "payment",
+              link: `/agency/${agency.id}/billing`,
+            },
+            {
+              name: "Settings",
+              icon: "settings",
+              link: `/agency/${agency.id}/settings`,
+            },
+            {
+              name: "Sub Accounts",
+              icon: "person",
+              link: `/agency/${agency.id}/all-subaccounts`,
+            },
+            {
+              name: "Team",
+              icon: "shield",
+              link: `/agency/${agency.id}/team`,
+            },
+          ],
+        },
       },
     });
-  } catch (error) {}
+    return agencyDetails;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getNotificationAndUser = async (agencyId: string) => {
+  try {
+    const response = await db.notification.findMany({
+      where: { agencyId },
+      include: { User: true },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
 };
