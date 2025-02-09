@@ -1,10 +1,14 @@
+import BlurPage from "@/components/global/blur-page";
+import InfoBar from "@/components/global/InfoBar";
 import Sidebar from "@/components/sidebar";
 import Unauthorized from "@/components/unauthorized";
 import {
   getNotificationAndUser,
   verifyAndAcceptInvitation,
 } from "@/lib/queries";
-import { currentUser } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs/server";
+import { clerkClient } from "@clerk/nextjs/server";
+import { id } from "date-fns/locale";
 import { redirect } from "next/navigation";
 import React from "react";
 
@@ -15,7 +19,7 @@ type Props = {
 
 const layout = async ({ children, params }: Props) => {
   const agencyId = await verifyAndAcceptInvitation();
-  const user = currentUser();
+  const user = await currentUser();
 
   if (!user) return redirect("/");
 
@@ -34,7 +38,15 @@ const layout = async ({ children, params }: Props) => {
   return (
     <div className="h-screen overflow-hidden">
       <Sidebar id={params.agencyId} type="agency" />
-      <div className="md:pl-[300px]"></div>
+      <div className="md:pl-[300px]">
+        <InfoBar
+          subAccountId={"dkfkdfd"}
+          notifications={notifications}
+        ></InfoBar>
+        <div className="relative">
+          <BlurPage> {children}</BlurPage>
+        </div>
+      </div>
     </div>
   );
 };
