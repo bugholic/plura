@@ -48,7 +48,7 @@ import { Switch } from "../ui/switch";
 import { Button } from "../ui/button";
 import Loading from "../global/loading";
 import { v4 } from "uuid";
-// import { useToast } from "../ui/use-toast";
+import { useToast } from "../ui/use-toast";
 
 type Props = {
   data?: Partial<Agency>;
@@ -68,7 +68,7 @@ const FormSchema = z.object({
 });
 
 const AgencyDetails = ({ data }: Props) => {
-  // const { toast } = useToast();
+  const { toast } = useToast();
   const router = useRouter();
   const [deletingAgency, setDeletingAgency] = React.useState(false);
 
@@ -106,17 +106,17 @@ const AgencyDetails = ({ data }: Props) => {
     // WIP: discontinue agency subscription
     try {
       const response = await deleteAgency(data.id);
-      // toast({
-      //   title: "Deleted Agency",
-      //   description: "Deleted your agency and all subaccounts",
-      // });
+      toast({
+        title: "Deleted Agency",
+        description: "Deleted your agency and all subaccounts",
+      });
       router.refresh();
     } catch (error) {
-      // toast({
-      //   variant: "destructive",
-      //   title: "Oops",
-      //   description: "Could not delete your agency",
-      // });
+      toast({
+        variant: "destructive",
+        title: "Oops",
+        description: "Could not delete your agency",
+      });
       setDeletingAgency(false);
     }
   };
@@ -167,9 +167,9 @@ const AgencyDetails = ({ data }: Props) => {
             createdAt: new Date(),
             updatedAt: new Date(),
           });
-          // toast({
-          //   title: "Created Agency",
-          // });
+          toast({
+            title: "Created Agency",
+          });
 
           if (data?.id) return router.refresh();
           if (response) {
@@ -178,11 +178,11 @@ const AgencyDetails = ({ data }: Props) => {
         }
       }
     } catch (error) {
-      // toast({
-      //   variant: "destructive",
-      //   title: "Oops",
-      //   description: "Could not create your agency",
-      // });
+      toast({
+        variant: "destructive",
+        title: "Oops",
+        description: "Could not create your agency",
+      });
     }
   };
 

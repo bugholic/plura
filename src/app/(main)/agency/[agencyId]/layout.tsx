@@ -36,7 +36,7 @@ const layout = async ({ children, params }: Props) => {
   if (notifications) allNoti = notifications;
 
   return (
-    <div className="h-screen overflow-hidden">
+    <div className="h-screen mt-10">
       <Sidebar id={params.agencyId} type="agency" />
       <div className="md:pl-[300px]">
         <InfoBar
@@ -44,7 +44,7 @@ const layout = async ({ children, params }: Props) => {
           notifications={notifications}
         ></InfoBar>
         <div className="relative">
-          <BlurPage> {children}</BlurPage>
+        {children}
         </div>
       </div>
     </div>
