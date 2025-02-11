@@ -130,7 +130,7 @@ const MenuOptions = ({
                         <CommandItem className="!bg-transparent my-2 text-primary border-[1px] border-border rounded-md hover:!bg-muted cursor-pointer transition-all">
                           {defaultOpen ? (
                             <Link
-                              href={`agency/${user?.Agency?.id}`}
+                              href={`/agency/${user?.Agency?.id}`}
                               className="flex gap-4 w-full h-full"
                             >
                               <div className="relative w-16">
@@ -152,7 +152,7 @@ const MenuOptions = ({
                           ) : (
                             <SheetClose asChild>
                               <Link
-                                href={`agency/${user?.Agency?.id}`}
+                                href={`/agency/${user?.Agency?.id}`}
                                 className="flex gap-4 w-full h-full"
                               >
                                 <div className="relative w-16">
@@ -182,7 +182,7 @@ const MenuOptions = ({
                           <CommandItem key={subaccount.id}>
                             {defaultOpen ? (
                               <Link
-                                href={`subaccount/${subaccount?.id}`}
+                                href={`/subaccount/${subaccount?.id}`}
                                 className="flex gap-4 w-full h-full"
                               >
                                 <div className="relative w-16">
@@ -204,7 +204,7 @@ const MenuOptions = ({
                             ) : (
                               <SheetClose asChild>
                                 <Link
-                                  href={`subaccount/${subaccount?.id}`}
+                                  href={`/subaccount/${subaccount?.id}`}
                                   className="flex gap-4 w-full h-full"
                                 >
                                   <div className="relative w-16">
@@ -277,7 +277,7 @@ const MenuOptions = ({
                     return (
                       <CommandItem
                         key={sidebarOptions.id}
-                        className="md:w-[320px] w-full"
+                        className=" w-full"
                       >
                         <Link
                           href={sidebarOptions.link}

@@ -191,7 +191,7 @@ const UserDetails = ({ id, type, subAccounts, userData }: Props) => {
       if (updatedUser) {
         toast({
           title: "Success",
-          description: "Update User Information",
+          description: "Updated User Information",
         });
         setClose();
         router.refresh();
@@ -338,7 +338,7 @@ const UserDetails = ({ id, type, subAccounts, userData }: Props) => {
                     return (
                       <div
                         key={subAccount.id}
-                        className="flex flex-col items-center justify-between rounded-lg border p-4"
+                        className="flex items-center justify-between rounded-lg border p-4"
                       >
                         <p>{subAccount.name}</p>
                         <Switch

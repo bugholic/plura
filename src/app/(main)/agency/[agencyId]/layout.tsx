@@ -43,7 +43,7 @@ const layout = async ({ children, params }: Props) => {
           subAccountId={"dkfkdfd"}
           notifications={notifications}
         ></InfoBar>
-        <div className="relative">
+        <div className="relative mt-16">
         {children}
         </div>
       </div>

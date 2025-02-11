@@ -1,3 +1,4 @@
+'use client'
 import SubAccountDetails from "@/components/forms/subaccount-details";
 import CustomModal from "@/components/global/custom-modal";
 import { Button } from "@/components/ui/button";
