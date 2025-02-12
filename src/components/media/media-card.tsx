@@ -73,24 +73,7 @@ const MediaCard = ({ file }: Props) => {
               <Copy size={15} /> Copy Image Link
             </DropdownMenuItem>
             <AlertDialogTrigger asChild>
-              <DropdownMenuItem
-                className="flex gap-2"
-                onClick={async () => {
-                  setLoading(true);
-                  const response = await deleteMedia(file.id);
-                  await saveActivityLogsNotification({
-                    agencyId: undefined,
-                    description: `Deleted a media file | ${response?.name}`,
-                    subaccountId: response.subAccountId,
-                  });
-                  toast({
-                    title: "Deleted File",
-                    description: "Successfully deleted the file",
-                  });
-                  setLoading(false);
-                  router.refresh();
-                }}
-              >
+              <DropdownMenuItem className="flex gap-2">
                 <Trash size={15} /> Delete File
               </DropdownMenuItem>
             </AlertDialogTrigger>
