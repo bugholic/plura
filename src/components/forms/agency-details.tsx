@@ -41,7 +41,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from "../ui/form";
 import FileUpload from "../global/file-upload";
 import { Input } from "../ui/input";
 import { Switch } from "../ui/switch";
