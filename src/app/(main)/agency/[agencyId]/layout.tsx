@@ -7,8 +7,6 @@ import {
   verifyAndAcceptInvitation,
 } from "@/lib/queries";
 import { currentUser } from "@clerk/nextjs/server";
-import { clerkClient } from "@clerk/nextjs/server";
-import { id } from "date-fns/locale";
 import { redirect } from "next/navigation";
 import React from "react";
 
@@ -40,12 +38,10 @@ const layout = async ({ children, params }: Props) => {
       <Sidebar id={params.agencyId} type="agency" />
       <div className="md:pl-[300px]">
         <InfoBar
-          subAccountId={"dkfkdfd"}
           notifications={notifications}
+          role={allNoti.User?.role}
         ></InfoBar>
-        <div className="relative mt-16">
-        {children}
-        </div>
+        <div className="relative mt-16">{children}</div>
       </div>
     </div>
   );

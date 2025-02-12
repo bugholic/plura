@@ -16,6 +16,7 @@ import {
 } from "@prisma/client";
 import { v4 } from "uuid";
 import { string } from "zod";
+import { CreateMediaType } from "./types";
 
 // server action file
 
@@ -436,28 +437,26 @@ export const deleteSubAccount = async (subAccountId: string) => {
   return response;
 };
 
-
 export const deleteUser = async (userId: string) => {
   await clerkClient.users.updateUserMetadata(userId, {
     privateMetadata: {
       role: undefined,
     },
-  })
-  const deletedUser = await db.user.delete({ where: { id: userId } })
+  });
+  const deletedUser = await db.user.delete({ where: { id: userId } });
 
-  return deletedUser
-}
+  return deletedUser;
+};
 
 export const getUser = async (id: string) => {
   const user = await db.user.findUnique({
     where: {
       id,
     },
-  })
+  });
 
-  return user
-}
-
+  return user;
+};
 
 export const sendInvitation = async (
   role: Role,
@@ -466,7 +465,7 @@ export const sendInvitation = async (
 ) => {
   const resposne = await db.invitation.create({
     data: { email, agencyId, role },
-  })
+  });
 
   try {
     const invitation = await clerkClient.invitations.createInvitation({
@@ -476,11 +475,44 @@ export const sendInvitation = async (
         throughInvitation: true,
         role,
       },
-    })
+    });
   } catch (error) {
-    console.log(error)
-    throw error
+    console.log(error);
+    throw error;
   }
 
-  return resposne
-}
+  return resposne;
+};
+
+export const getMedia = async (subAccountId: string) => {
+  const mediafiles = await db.subAccount.findUnique({
+    where: {
+      id: subAccountId,
+    },
+    include: { Media: true },
+  });
+  return mediafiles;
+};
+
+export const createMedia = async (
+  subaccountId: string,
+  mediaFile: CreateMediaType
+) => {
+  const response = await db.media.create({
+    data: {
+      link: mediaFile.link,
+      name: mediaFile.name,
+      subAccountId: subaccountId,
+    },
+  });
+  return response;
+};
+
+export const deleteMedia = async (mediaId: string) => {
+  const response = await db.media.delete({
+    where: {
+      id: mediaId,
+    },
+  });
+  return response;
+};
