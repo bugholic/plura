@@ -29,9 +29,9 @@ import { Draggable, Droppable } from "react-beautiful-dnd";
 import { Edit, MoreVertical, PlusCircleIcon, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { Dispatch, SetStateAction, useMemo } from "react";
-import PipelineTicket from './pipeline-ticket'
+import PipelineTicket from "./pipeline-ticket";
 import CustomModal from "@/components/global/custom-modal";
-import TicketForm from "@/components/forms/tickets-form";
+import TicketForm from "@/components/forms/ticket-form";
 
 interface PipelaneLaneProps {
   setAllTickets: Dispatch<SetStateAction<TicketWithTags>>;
@@ -173,22 +173,21 @@ const PipelineLane: React.FC<PipelaneLaneProps> = ({
                     type="ticket"
                   >
                     {(provided) => (
-                      <div className=" max-h-[700px] overflow-scroll pt-12 ">
+                      <div className=" max-h-[700px] overflow-auto pt-12 ">
                         <div
                           {...provided.droppableProps}
                           ref={provided.innerRef}
                           className="mt-2"
                         >
                           {tickets.map((ticket, index) => (
-                            <div key={ticket.id}></div>
-                            // <PipelineTicket
-                            //   allTickets={allTickets}
-                            //   setAllTickets={setAllTickets}
-                            //   subaccountId={subaccountId}
-                            //   ticket={ticket}
-                            //   key={ticket.id.toString()}
-                            //   index={index}
-                            // />
+                            <PipelineTicket
+                              allTickets={allTickets}
+                              setAllTickets={setAllTickets}
+                              subaccountId={subaccountId}
+                              ticket={ticket}
+                              key={ticket.id.toString()}
+                              index={index}
+                            />
                           ))}
                           {provided.placeholder}
                         </div>
