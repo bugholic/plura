@@ -74,7 +74,7 @@ const InfoBar = ({ notifications, subAccountId, className, role }: Props) => {
               {allNotifications?.map((notification) => (
                 <div
                   key={notification.id}
-                  className="flex flex-col gap-y-2 mb-2 overflow-x-scroll text-ellipsis"
+                  className="flex flex-col gap-y-2 mb-2  text-ellipsis"
                 >
                   <div className="flex gap-2">
                     <Avatar>

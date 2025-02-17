@@ -170,7 +170,7 @@ const PipelineTicket = ({
                         <div className="flex justify-between space-x-4">
                           <Avatar>
                             <AvatarImage />
-                            <AvatarFallback className="bg-primary">
+                            <AvatarFallback className="bg-blue-500">
                               {ticket.Customer?.name.slice(0, 2).toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
