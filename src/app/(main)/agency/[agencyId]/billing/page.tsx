@@ -4,12 +4,25 @@ import { db } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
 import React from "react";
 import PricingCard from "./_components/pricing-card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import clsx from "clsx";
 
 type Props = {
   params: { agencyId: string };
 };
 
 const BillingPage = async ({ params }: Props) => {
+  // console.log("Product ID:", process.env.NEXT_PLURA_PRODUCT_ID);
+  // const allPrices = await stripe.prices.list();
+  // console.log(allPrices);
+
   const addOns = await stripe.products.list({
     ids: addOnProducts.map((product) => product.id),
     expand: ["data.default_price"],
@@ -27,6 +40,7 @@ const BillingPage = async ({ params }: Props) => {
     product: process.env.NEXT_PLURA_PRODUCT_ID,
     active: true,
   });
+  // console.log("Prices Response data:", prices.data.map((price)=>console.log(price.unit_amount)));
 
   const currentPlanDetails = pricingCards.find(
     (c) => c.priceId === agencySubscription?.Subscription?.priceId
@@ -50,7 +64,6 @@ const BillingPage = async ({ params }: Props) => {
       amount: `$${charge.amount / 100}`,
     })),
   ];
-
   return (
     <>
       <h1 className="text-4xl p-4">Billing</h1>
@@ -78,11 +91,14 @@ const BillingPage = async ({ params }: Props) => {
               ? currentPlanDetails?.description || "Lets get started"
               : "Lets get started! Pick a plan that works best for you."
           }
-          duration="/ month"
+          duration="/month"
           features={
             agencySubscription?.Subscription?.active === true
               ? currentPlanDetails?.features || []
-              : []
+              : currentPlanDetails?.features ||
+                pricingCards.find((pricing) => pricing.title === "Starter")
+                  ?.features ||
+                []
           }
           title={
             agencySubscription?.Subscription?.active === true
@@ -90,7 +106,65 @@ const BillingPage = async ({ params }: Props) => {
               : "Starter"
           }
         />
+        {addOns.data.map((addOn) => (
+          <PricingCard
+            planExists={agencySubscription?.Subscription?.active === true}
+            prices={prices.data}
+            customerId={agencySubscription?.customerId || ""}
+            key={addOn.id}
+            amt={
+              //@ts-ignore
+              addOn.default_price?.unit_amount
+                ? //@ts-ignore
+                  `$${addOn.default_price.unit_amount / 100}`
+                : "$0"
+            }
+            buttonCta="Subscribe"
+            description="Dedicated support line & teams channel for support"
+            duration="/ month"
+            features={[]}
+            title={"24/7 priority support"}
+            highlightTitle="Get support now!"
+            highlightDescription="Get priority support and skip the long long with the click of a button."
+          />
+        ))}
       </div>
+      <h2 className="text-2xl p-4">Payment History</h2>
+      <Table className="bg-card border-[1px] border-border rounded-md">
+        <TableHeader className="rounded-md">
+          <TableRow>
+            <TableHead className="w-[200px]">Description</TableHead>
+            <TableHead className="w-[200px]">Invoice Id</TableHead>
+            <TableHead className="w-[300px]">Date</TableHead>
+            <TableHead className="w-[200px]">Paid</TableHead>
+            <TableHead className="text-right">Amount</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody className="font-medium truncate">
+          {allCharges.map((charge) => (
+            <TableRow key={charge.id}>
+              <TableCell>{charge.description}</TableCell>
+              <TableCell className="text-muted-foreground">
+                {charge.id}
+              </TableCell>
+              <TableCell>{charge.date}</TableCell>
+              <TableCell>
+                <p
+                  className={clsx("", {
+                    "text-emerald-500": charge.status.toLowerCase() === "paid",
+                    "text-orange-600":
+                      charge.status.toLowerCase() === "pending",
+                    "text-red-600": charge.status.toLowerCase() === "failed",
+                  })}
+                >
+                  {charge.status.toUpperCase()}
+                </p>
+              </TableCell>
+              <TableCell className="text-right">{charge.amount}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </>
   );
 };

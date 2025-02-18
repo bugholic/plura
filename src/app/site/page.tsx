@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { pricingCards } from "@/lib/utils";
+import { pricingCards } from "@/lib/constants";
 import clsx from "clsx";
 import { Check } from "lucide-react";
 import Image from "next/image";
@@ -43,9 +43,8 @@ export default async function Home() {
           {"you're"} not <br /> ready to commit you can get started for free.
         </p>
         <div className="flex  gap-4 flex-wrap justify-center mt-6">
-          {pricingCards.map((card) => (
+          {pricingCards.map((card:any) => (
             // WIP: Wire up free product from  stripe
-
             <Card
               key={card.title}
               className={clsx("w-[300px]  flex flex-col justify-between", {
@@ -68,7 +67,7 @@ export default async function Home() {
               </CardContent>
               <CardFooter className="flex flex-col items-start gap-4 ">
                 <div>
-                  {card.features.map((feature) => (
+                  {card.features.map((feature:any) => (
                     <div key={feature} className="flex gap-2 items-center">
                       <Check /> <p>{feature}</p>{" "}
                     </div>
