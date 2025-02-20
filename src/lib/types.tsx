@@ -43,7 +43,7 @@ export type UserWithPermissionsAndSubAccounts = Prisma.PromiseReturnType<
 export type AuthUserWithAgencySigebarOptionsSubAccounts =
   Prisma.PromiseReturnType<typeof getAuthUserDetails>;
 
-const __getUsersWithAgencySubAccountPermissionsSidebarOptions = async (
+export const __getUsersWithAgencySubAccountPermissionsSidebarOptions = async (
   agencyId: string
 ) => {
   return await db.user.findFirst({
@@ -54,6 +54,11 @@ const __getUsersWithAgencySubAccountPermissionsSidebarOptions = async (
     },
   });
 };
+
+export type UsersWithAgencySubAccountPermissionsSidebarOptions =
+  Prisma.PromiseReturnType<
+    typeof __getUsersWithAgencySubAccountPermissionsSidebarOptions
+  >;
 
 export type GetMediaFiles = Prisma.PromiseReturnType<typeof getMedia>;
 
