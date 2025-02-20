@@ -5,7 +5,7 @@ type Props = {};
 
 const Unauthorized = (props: Props) => {
   return (
-    <div className="p-4 text-center flex flex-col items-center justify-center">
+    <div className="p-4 text-center flex flex-col items-center h-screen justify-center">
       Unauthorized
       <h1 className="text-3xl md:text-6xl">Unauthorized Access</h1>
       <p>Please contact support or your agency owner to get access</p>

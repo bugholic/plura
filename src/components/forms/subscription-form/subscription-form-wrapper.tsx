@@ -73,7 +73,6 @@ const SubscriptionFormWrapper = ({ customerId, planExists }: Props) => {
     createSecret();
   }, [data, selectedPriceId, customerId]);
 
-  console.log(data)
   return (
     <div className="border-none transition-all">
       <div className="flex flex-col gap-4">

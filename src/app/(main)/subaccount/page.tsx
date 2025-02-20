@@ -21,7 +21,7 @@ const SubAccountMainPage = async ({ searchParams }: Props) => {
         const stateSubaccountId = searchParams.state.split('___')[1]
         if (!stateSubaccountId) <Unauthorized />
         return redirect(
-            `/subaccoount/${stateSubaccountId}/${statePath}?code=${searchParams.code}`
+            `/subaccount/${stateSubaccountId}/${statePath}?code=${searchParams.code}`
         )
     }
 
