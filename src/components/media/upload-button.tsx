@@ -15,6 +15,7 @@ const MediaUploadButton = ({ subaccountId }: Props) => {
 
   return (
     <Button
+    className="!bg-blue-500 !text-white"
       onClick={() => {
         setOpen(
           <CustomModal
@@ -25,7 +26,7 @@ const MediaUploadButton = ({ subaccountId }: Props) => {
           </CustomModal>
         );
       }}
-    ></Button>
+    >Upload</Button>
   );
 };
 

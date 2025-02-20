@@ -1,5 +1,9 @@
+"use client";
+
 import { EditorBtns } from "@/lib/constants";
 import { EditorAction } from "./editor-action";
+import { createContext, Dispatch, useContext, useReducer } from "react";
+import { FunnelPage } from "@prisma/client";
 
 export type DeviceTypes = "Desktop" | "Mobile" | "Tablet";
 
@@ -8,7 +12,7 @@ export type EditorElement = {
   styles: React.CSSProperties;
   name: string;
   type: EditorBtns;
-  content: EditorElement[] | {};
+  content: EditorElement[] | { href?: string };
 };
 
 export type Editor = {
@@ -346,3 +350,52 @@ export type EditorContextData = {
   setPreviewMode: (previewMode: boolean) => void;
   setDevice: (device: DeviceTypes) => void;
 };
+
+export const EditorContext = createContext<{
+  state: EditorState;
+  dispatch: Dispatch<EditorAction>;
+  subaccountId: string;
+  funnelId: string;
+  pageDetails: FunnelPage | null;
+}>({
+  state: initialState,
+  dispatch: () => undefined,
+  subaccountId: "",
+  funnelId: "",
+  pageDetails: null,
+});
+
+type EditorProps = {
+  children: React.ReactNode;
+  subaccountId: string;
+  funelId: string;
+  pageDetails: FunnelPage;
+};
+
+const EditorProvider = (props: EditorProps) => {
+  const [state, dispatch] = useReducer(editorReducer, initialState);
+
+  return (
+    <EditorContext.Provider
+      value={{
+        state,
+        dispatch,
+        subaccountId: props.subaccountId,
+        funnelId: props.funelId,
+        pageDetails: props.pageDetails,
+      }}
+    >
+      {props.children}
+    </EditorContext.Provider>
+  );
+};
+
+export const useEditor = () => {
+  const context = useContext(EditorContext);
+  if (!context) {
+    throw new Error("useEditor Hook must be used within the editor provider");
+  }
+  return context;
+};
+
+export default EditorProvider;
