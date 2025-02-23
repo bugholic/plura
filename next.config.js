@@ -10,9 +10,9 @@ const nextConfig = {
       ],
     },
     reactStrictMode: false,
-    experimental: {
-      runtime: 'nodejs', // Force Node.js runtime
-    },
+    // experimental: {
+    //   runtime: 'nodejs', // Force Node.js runtime
+    // },
   }
 
   module.exports = nextConfig
