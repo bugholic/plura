@@ -48,7 +48,7 @@ export async function POST(req: Request) {
         clientSecret: subscription.latest_invoice.payment_intent.client_secret,
       });
     } else {
-      console.log("creating subs");
+      // console.log("creating subs");
       const subscription = await stripe.subscriptions.create({
         customer: customerId,
         items: [

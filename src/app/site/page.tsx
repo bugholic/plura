@@ -7,12 +7,18 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { pricingCards } from "@/lib/constants";
+import { stripe } from "@/lib/stripe";
 import clsx from "clsx";
 import { Check } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
 export default async function Home() {
+  const prices = await stripe.prices.list({
+    product: process.env.NEXT_PLURA_PRODUCT_ID,
+    active: true,
+  });
+
   return (
     <>
       <section className="h-full w-full pt-36 relative flex items-center justify-center flex-col">
@@ -43,41 +49,85 @@ export default async function Home() {
           {"you're"} not <br /> ready to commit you can get started for free.
         </p>
         <div className="flex  gap-4 flex-wrap justify-center mt-6">
-          {pricingCards.map((card:any) => (
-            // WIP: Wire up free product from  stripe
+          <Card className={clsx("w-[300px]  flex flex-col justify-between")}>
+            <CardHeader>
+              <CardTitle>Starter</CardTitle>
+              <CardDescription>Perfect for trying out plura</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <span className="text-4xl font-bold">Free</span>
+              <span className="text-muted-foreground">
+                <span>/m</span>
+              </span>
+            </CardContent>
+            <CardFooter className="flex flex-col items-start gap-4 ">
+              <div>
+                {pricingCards
+                  .find((c) => c.title === "Starter")
+                  ?.features.map((feature) => (
+                    <div key={feature} className="flex gap-2 items-center">
+                      <Check /> <p>{feature}</p>{" "}
+                    </div>
+                  ))}
+              </div>
+              <Link
+                href={`/agency?plan=free`}
+                className={clsx(
+                  "w-full text-center bg-gray-300 text-black p-2 rounded-md"
+                )}
+              >
+                Get Started
+              </Link>
+            </CardFooter>
+          </Card>
+          {prices.data.map((card: any) => (
             <Card
-              key={card.title}
+              key={card.nickname}
               className={clsx("w-[300px]  flex flex-col justify-between", {
-                "border-2  border-primary": card.title === "Unlimited SaaS",
+                "border-2  border-primary": card.nickname === "Unlimited SaaS",
               })}
             >
               <CardHeader>
                 <CardTitle
                   className={clsx("", {
-                    "text-muted-primary": card.title !== "Unlimited SaaS",
+                    "text-muted-primary": card.nickname !== "Unlimited SaaS",
                   })}
                 >
-                  {card.title}
+                  {card.nickname}
                 </CardTitle>
-                <CardDescription>{card.description}</CardDescription>
+                <CardDescription>
+                  {
+                    pricingCards.find((c) => c.title === card.nickname)
+                      ?.description
+                  }
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <span className="text-4xl font-bold">{card.price}</span>
-                <span className="text-muted-foreground">/m</span>
+                <span className="text-4xl font-bold">
+                  {card.unit_amount && card.unit_amount / 100}
+                </span>
+                <span className="text-muted-foreground">
+                  <span>/ {card.recurring?.interval}</span>
+                </span>
               </CardContent>
               <CardFooter className="flex flex-col items-start gap-4 ">
                 <div>
-                  {card.features.map((feature:any) => (
-                    <div key={feature} className="flex gap-2 items-center">
-                      <Check /> <p>{feature}</p>{" "}
-                    </div>
-                  ))}
+                  {pricingCards
+                    .find((c) => c.title === card.nickname)
+                    ?.features.map((feature) => (
+                      <div key={feature} className="flex gap-2 items-center">
+                        <Check /> <p>{feature}</p>{" "}
+                      </div>
+                    ))}
                 </div>
                 <Link
-                  href={`/agency?plan=${card.priceId}`}
+                  href={`/agency?plan=${card.id}`}
                   className={clsx(
                     "w-full text-center bg-gray-300 text-black p-2 rounded-md",
-                    { "!bg-blue-600 text-white/70": card.title === "Unlimited SaaS" }
+                    {
+                      "!bg-blue-600 text-white/70":
+                        card.nickname === "Unlimited SaaS",
+                    }
                   )}
                 >
                   Get Started

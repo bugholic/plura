@@ -64,7 +64,6 @@ const PipelineView = ({
   };
 
   const onDragEnd = (dropResult: DropResult) => {
-    console.log();
     const { destination, source, type } = dropResult;
     if (
       !destination ||

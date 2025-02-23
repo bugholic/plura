@@ -73,10 +73,11 @@ const SubscriptionFormWrapper = ({ customerId, planExists }: Props) => {
     createSecret();
   }, [data, selectedPriceId, customerId]);
 
+  console.log("data" + data.plans?.stripePlans)
   return (
     <div className="border-none transition-all">
       <div className="flex flex-col gap-4">
-        {data.plans?.stripePlans.map((price) => (
+        {!data.plans?.stripePlans ? <div>Unable to load prices</div> : data.plans?.stripePlans.map((price) => (
           <Card
             onClick={() => setSelectedPriceId(price.id as Plan)}
             key={price.id}

@@ -52,3 +52,9 @@ update event listener for component  [ in container inside funnel editor compone
 build the component in funnel 
 
 update recursive component
+
+
+<!-- Stripe Listen Port -->
+
+To use strip must listen the port
+stripe listen --forward-to http://localhost:3000/webhook
