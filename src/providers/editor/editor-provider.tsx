@@ -381,7 +381,7 @@ const EditorProvider = (props: EditorProps) => {
         state,
         dispatch,
         subaccountId: props.subaccountId,
-        funnelId: props.funelId,
+        funnelId: props.funnelId,
         pageDetails: props.pageDetails,
       }}
     >
